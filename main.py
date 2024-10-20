@@ -56,9 +56,28 @@ def main():
 
     intervals = st.number_input("Time Interval (minutes)", value=5, step=1)
 
-    # Calculate projections
-    time_projections = calculate_time_cycles(low_time, high_time, intervals)
-    price_projections = calculate_price_targets(low_price, high_price)
+    # Validate intervals
+    if intervals <= 0:
+        st.error("Time Interval must be a positive number.")
+        return
+
+    # Output variable values for debugging
+    st.write(f"Low Time: {low_time}")
+    st.write(f"High Time: {high_time}")
+    st.write(f"Intervals: {intervals}")
+
+    # Calculate projections with error handling
+    try:
+        time_projections = calculate_time_cycles(low_time, high_time, intervals)
+    except Exception as e:
+        st.error(f"An error occurred in calculate_time_cycles: {e}")
+        return
+
+    try:
+        price_projections = calculate_price_targets(low_price, high_price)
+    except Exception as e:
+        st.error(f"An error occurred in calculate_price_targets: {e}")
+        return
 
     # Display results
     st.header("Projected Reversal Dates and Times")
