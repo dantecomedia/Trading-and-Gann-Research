@@ -1,11 +1,11 @@
 import streamlit as st
 import pandas as pd
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, time
 
 # Function to calculate time intervals and projected dates
-def calculate_time_cycles(low_time, high_time, intervals):
+def calculate_time_cycles(low_datetime, high_datetime, intervals):
     projections = []
-    initial_duration = (high_time - low_time).total_seconds() / 60  # in minutes
+    initial_duration = (high_datetime - low_datetime).total_seconds() / 60  # in minutes
     num_intervals = initial_duration / intervals  # Number of intervals
 
     # Gann's key numbers and Fibonacci ratios
@@ -16,28 +16,28 @@ def calculate_time_cycles(low_time, high_time, intervals):
     # Time projections based on initial movement
     for num in gann_numbers:
         minutes_to_add = num * intervals
-        projected_time = high_time + timedelta(minutes=minutes_to_add)
+        projected_time = high_datetime + timedelta(minutes=minutes_to_add)
         projections.append({
-            'Description': f'Gann Number {num}',
-            'Projected Time': projected_time
+            'Description': f'Gann Number {num:.2f}',
+            'Projected Time': projected_time.strftime('%Y-%m-%d %H:%M')
         })
 
     # Time projections based on squares
     for square in squares:
         minutes_to_add = square * intervals
-        projected_time = high_time + timedelta(minutes=minutes_to_add)
+        projected_time = high_datetime + timedelta(minutes=minutes_to_add)
         projections.append({
             'Description': f'Square of {int(square ** 0.5)}',
-            'Projected Time': projected_time
+            'Projected Time': projected_time.strftime('%Y-%m-%d %H:%M')
         })
 
     # Time projections based on Fibonacci ratios
     for ratio in fibonacci_ratios:
         minutes_to_add = num_intervals * ratio * intervals
-        projected_time = high_time + timedelta(minutes=minutes_to_add)
+        projected_time = high_datetime + timedelta(minutes=minutes_to_add)
         projections.append({
             'Description': f'Fibonacci Ratio {ratio}',
-            'Projected Time': projected_time
+            'Projected Time': projected_time.strftime('%Y-%m-%d %H:%M')
         })
 
     return projections
@@ -52,7 +52,7 @@ def calculate_price_targets(low_price, high_price):
     for mult in bullish_multipliers:
         projected_price = high_price + price_movement * mult
         projections.append({
-            'Scenario': f'Bullish Extension {mult * 100}%',
+            'Scenario': f'Bullish Extension {mult * 100:.1f}%',
             'Projected Price': projected_price
         })
 
@@ -61,7 +61,7 @@ def calculate_price_targets(low_price, high_price):
     for mult in bearish_multipliers:
         projected_price = high_price - price_movement * mult
         projections.append({
-            'Scenario': f'Bearish Retracement {mult * 100}%',
+            'Scenario': f'Bearish Retracement {mult * 100:.1f}%',
             'Projected Price': projected_price
         })
 
@@ -79,14 +79,24 @@ def main():
     with col1:
         st.subheader("Significant Low")
         low_price = st.number_input("Low Price", value=67651.0, format="%.2f")
-        low_time_str = st.text_input("Low Time (YYYY-MM-DD HH:MM)", "2024-10-18 18:25")
-        low_time = datetime.strptime(low_time_str, "%Y-%m-%d %H:%M")
+
+        # Date input
+        low_date = st.date_input("Low Date", value=datetime(2024, 10, 18))
+        # Time dropdown
+        times = [time(h, m) for h in range(0, 24) for m in (0, 15, 30, 45)]
+        time_options = [t.strftime('%H:%M') for t in times]
+        low_time_str = st.selectbox("Low Time", options=time_options, index=time_options.index('18:25'))
+        low_time = datetime.combine(low_date, datetime.strptime(low_time_str, '%H:%M').time())
 
     with col2:
         st.subheader("Significant High")
         high_price = st.number_input("High Price", value=68995.0, format="%.2f")
-        high_time_str = st.text_input("High Time (YYYY-MM-DD HH:MM)", "2024-10-19 00:15")
-        high_time = datetime.strptime(high_time_str, "%Y-%m-%d %H:%M")
+
+        # Date input
+        high_date = st.date_input("High Date", value=datetime(2024, 10, 19))
+        # Time dropdown
+        high_time_str = st.selectbox("High Time", options=time_options, index=time_options.index('00:15'))
+        high_time = datetime.combine(high_date, datetime.strptime(high_time_str, '%H:%M').time())
 
     intervals = st.number_input("Time Interval (minutes)", value=5, step=1)
 
@@ -103,7 +113,5 @@ def main():
     price_df = pd.DataFrame(price_projections)
     st.table(price_df)
 
-    # Optionally, add charts or additional analysis
-
 if __name__ == "__main__":
-    main()
+        main()
