@@ -5,6 +5,38 @@ from datetime import datetime, timedelta, time
 # Function to calculate time intervals and projected dates remains the same
 # Function to calculate price targets remains the same
 
+def calculate_time_cycles(low_time, high_time, intervals):
+    projections = []
+    initial_duration = (high_time - low_time).total_seconds() / 60  # in minutes
+    st.write(f"Initial Duration: {initial_duration} minutes")
+    num_intervals = initial_duration / intervals  # Number of intervals
+    st.write(f"Number of Intervals: {num_intervals}")
+
+    if num_intervals <= 0:
+        st.error("Number of intervals calculated is zero or negative. Check your input times and intervals.")
+        return []
+
+    # Gann's key numbers and Fibonacci ratios
+    gann_numbers = [num_intervals, 90, 144, 180, 270, 360]
+    squares = [64, 81]
+    fibonacci_ratios = [0.618, 1, 1.618, 2.618]
+
+    # Time projections based on initial movement
+    for num in gann_numbers:
+        minutes_to_add = num * intervals
+        # Check for reasonable minutes_to_add
+        if minutes_to_add > 1e6:
+            st.error(f"Minutes to add is excessively large ({minutes_to_add}). Check your inputs.")
+            continue
+        projected_time = high_time + timedelta(minutes=minutes_to_add)
+        projections.append({
+            'Description': f'Gann Number {num:.2f}',
+            'Projected Time': projected_time.strftime('%Y-%m-%d %H:%M')
+        })
+
+    # ... rest of the function ...
+
+
 def main():
     st.title("Gann Time Cycle Analysis for BTC")
 
