@@ -29,7 +29,7 @@ def calculate_time_cycles(low_time, high_time, intervals):
         projected_time = high_time + timedelta(minutes=minutes_to_add)
         projections.append({
             'Description': f'Gann Number {num:.2f}',
-            'Projected Time': projected_time.strftime('%Y-%m-%d %H:%M')
+            'Projected Time': projected_time.strftime('%Y-%m-%d %I:%M %p')
         })
 
     # Time projections based on squares
@@ -38,7 +38,7 @@ def calculate_time_cycles(low_time, high_time, intervals):
         projected_time = high_time + timedelta(minutes=minutes_to_add)
         projections.append({
             'Description': f'Square of {int(square ** 0.5)}',
-            'Projected Time': projected_time.strftime('%Y-%m-%d %H:%M')
+            'Projected Time': projected_time.strftime('%Y-%m-%d %I:%M %p')
         })
 
     # Time projections based on Fibonacci ratios
@@ -47,7 +47,7 @@ def calculate_time_cycles(low_time, high_time, intervals):
         projected_time = high_time + timedelta(minutes=minutes_to_add)
         projections.append({
             'Description': f'Fibonacci Ratio {ratio}',
-            'Projected Time': projected_time.strftime('%Y-%m-%d %H:%M')
+            'Projected Time': projected_time.strftime('%Y-%m-%d %I:%M %p')
         })
 
     return projections
@@ -93,7 +93,7 @@ def main():
 
     # Generate times at 5-minute intervals
     times = [time(h, m) for h in range(0, 24) for m in range(0, 60, 5)]
-    time_options = [t.strftime('%H:%M') for t in times]
+    time_options = [t.strftime('%I:%M %p') for t in times]
 
     with col1:
         st.subheader("Significant Low")
@@ -104,12 +104,12 @@ def main():
 
         # Time dropdown with default index
         try:
-            default_index_low = time_options.index('18:25')
+            default_index_low = time_options.index('06:25 PM')
         except ValueError:
-            default_index_low = 0  # Fallback index if '18:25' is not in time_options
+            default_index_low = 0  # Fallback index if '06:25 PM' is not in time_options
 
         low_time_str = st.selectbox("Low Time", options=time_options, index=default_index_low)
-        low_time = datetime.combine(low_date, datetime.strptime(low_time_str, '%H:%M').time())
+        low_time = datetime.combine(low_date, datetime.strptime(low_time_str, '%I:%M %p').time())
 
     with col2:
         st.subheader("Significant High")
@@ -120,12 +120,12 @@ def main():
 
         # Time dropdown with default index
         try:
-            default_index_high = time_options.index('00:15')
+            default_index_high = time_options.index('12:15 AM')
         except ValueError:
-            default_index_high = 0  # Fallback index if '00:15' is not in time_options
+            default_index_high = 0  # Fallback index if '12:15 AM' is not in time_options
 
         high_time_str = st.selectbox("High Time", options=time_options, index=default_index_high)
-        high_time = datetime.combine(high_date, datetime.strptime(high_time_str, '%H:%M').time())
+        high_time = datetime.combine(high_date, datetime.strptime(high_time_str, '%I:%M %p').time())
 
     # Ensure high_time is after low_time
     if high_time <= low_time:
